@@ -6,7 +6,8 @@ const bot = new TelegramBot(token, { polling: true });
 
 // 2. Masukkan API Key Gemini kamu di sini (Langsung nembak server Google, dijamin anti error 401)
 // Ganti bagian const GEMINI_API_KEY dengan baris ini:
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 'AQ.Ab8RN6IQB2cTubx2B6dPN3lqwUPgfTTOVwn8QNv48wdTcyqfjw';
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY; 'Ab8RN6JutxRfciTuGEt8ULQNcZjla6_WeQz90sqHYLwlSiPKJg
+';
 
 const userLogs = {};
 
