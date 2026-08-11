@@ -1,12 +1,11 @@
 const TelegramBot = require('node-telegram-bot-api');
-const { GoogleGenAI } = require('@google/genai');
 
 // 1. Masukkan Token Telegram kamu di sini
 const token = '8646484566:AAGHZmdFp8xfk3_ypkio_OSbvf-y0P6ZGTk';
 const bot = new TelegramBot(token, { polling: true });
 
-// 2. Inisialisasi Gemini API versi paling stabil
-const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6IQz5IGK_NO3DiOmpQSJWM4ClGpTQQjeWKIgNLurhWwbA' });
+// 2. Masukkan API Key Gemini kamu di sini (Langsung nembak server Google, dijamin anti error 401)
+const GEMINI_API_KEY = 'AQ.Ab8RN6IQz5IGK_NO3DiOmpQSJWM4ClGpTQQjeWKIgNLurhWwbA';
 
 const userLogs = {};
 
@@ -49,22 +48,36 @@ bot.on('photo', async (msg) => {
         const buffer = await response.arrayBuffer();
         const base64Image = Buffer.from(buffer).toString("base64");
 
-        const aiResponse = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: [
-                {
-                    inlineData: {
-                        data: base64Image,
-                        mimeType: "image/jpeg"
-                    }
-                },
-                {
-                    text: "Analisis foto ini. Apakah ini makanan/minuman? Jika ya, berikan nama makanannya dan estimasi jumlah kalorinya (dalam angka saja untuk kalorinya). Jawab dengan format persis seperti ini:\nNama: [Nama Makanan]\nKalori: [Angka Kalori] kkal\nJika bukan makanan, tulis: Bukan makanan."
-                }
-            ]
+        // Request langsung ke API Google Gemini pakai fetch (Anti Error 401)
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+        
+        const aiRes = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [
+                        {
+                            inlineData: {
+                                mimeType: "image/jpeg",
+                                data: base64Image
+                            }
+                        },
+                        {
+                            text: "Analisis foto ini. Apakah ini makanan/minuman? Jika ya, berikan nama makanannya dan estimasi jumlah kalorinya (dalam angka saja untuk kalorinya). Jawab dengan format persis seperti ini:\nNama: [Nama Makanan]\nKalori: [Angka Kalori] kkal\nJika bukan makanan, tulis: Bukan makanan."
+                        }
+                    ]
+                }]
+            })
         });
 
-        const hasilText = aiResponse.text;
+        const aiData = await aiRes.json();
+        
+        if (aiData.error) {
+            throw new Error(aiData.error.message);
+        }
+
+        const hasilText = aiData.candidates[0].content.parts[0].text;
 
         if (hasilText.includes("Bukan makanan")) {
             bot.sendMessage(chatId, "Duh, itu sepertinya bukan foto makanan. Coba kirim foto makanan atau minuman ya! 🍼");
@@ -97,6 +110,6 @@ bot.on('photo', async (msg) => {
 
     } catch (error) {
         console.error(error);
-        bot.sendMessage(chatId, "Duh, maap ya fotonya gagal dibaca oleh server. Coba kirim ulang foto yang lebih jelas ya! 🍼");
+        bot.sendMessage(chatId, `Duh, maap ya terjadi kendala: ${error.message}`);
     }
 });
