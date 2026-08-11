@@ -49,8 +49,7 @@ bot.on('photo', async (msg) => {
         const base64Image = Buffer.from(buffer).toString("base64");
 
         // Request langsung ke API Google Gemini pakai fetch (Anti Error 401)
-        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-        
+        const geminiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
         const aiRes = await fetch(geminiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
