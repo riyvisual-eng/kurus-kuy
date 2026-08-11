@@ -1,12 +1,12 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { GoogleGenAI } = require('@google/genai');
 
-// Ganti token Telegram bot baru kamu di sini
-const token = '8674330073:AAEu7tplg7JCfty_iLey__ZwSV3VOvQZ0rU';
+// 1. Masukkan Token Telegram kamu di sini
+const token = '8646484566:AAGHZmdFp8xfk3_ypkio_OSbvf-y0P6ZGTk';
 const bot = new TelegramBot(token, { polling: true });
 
-// Inisialisasi Gemini (Masukkan API Key kamu langsung di dalam tanda petik di bawah)
-const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6J1foB1ALJKn3ur5f9wXlu7U-N1b_brqjh1uwncIakgqw' });
+// 2. Inisialisasi Gemini API versi paling stabil
+const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6JSqFnQcmcAB9ZI6M38ZkqGt3wJEu7jz965yi0jzPvzGg' });
 
 const userLogs = {};
 
@@ -49,7 +49,6 @@ bot.on('photo', async (msg) => {
         const buffer = await response.arrayBuffer();
         const base64Image = Buffer.from(buffer).toString("base64");
 
-        // Menggunakan model standar gemini-1.5-flash agar tidak error 404
         const aiResponse = await ai.models.generateContent({
             model: 'gemini-1.5-flash',
             contents: [
