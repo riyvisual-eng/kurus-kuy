@@ -1,26 +1,21 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { GoogleGenAI } = require('@google/genai');
 
-// Ganti dengan TOKEN bot Telegram baru kamu dari BotFather
+// Ganti token Telegram bot baru kamu di sini
 const token = '8674330073:AAEu7tplg7JCfty_iLey__ZwSV3VOvQZ0rU';
 const bot = new TelegramBot(token, { polling: true });
 
-// Inisialisasi Gemini API (Masukkan API Key Google AI Studio kamu)
-const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6L_ivmpiCz8-QwLmoTvX-kVoeL-8TCkAH7AbfhuxD53dA' });
+// Inisialisasi Gemini (Masukkan API Key kamu langsung di dalam tanda petik di bawah)
+const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6KKtqFF9kkySCgEXqxnqU23D-sq4Ff59V-FNvARSqOpzA' });
 
-// Penyimpanan data kalori harian sementara untuk pengguna (berdasarkan ID Telegram)
-// Format: { userId: { tanggal: 'YYYY-MM-DD', totalKalori: 0, riwayat: [] } }
 const userLogs = {};
 
 console.log("Bot Kalori Tracker aktif 24 jam!");
 
-// Pesan saat /start
 bot.onText(/\/start/, (msg) => {
-    const chatId = msg.chat.id;
-    bot.sendMessage(chatId, "Halo! Kirim foto makanan atau minuman kamu ke sini, nanti aku hitung kalorinya dan catat total harian kamu!\n\nKetik /rekap untuk melihat total kalori hari ini.");
+    bot.sendMessage(msg.chat.id, "Halo! Kirim foto makanan atau minuman kamu ke sini, nanti aku hitung kalorinya dan catat total harian kamu!\n\nKetik /rekap untuk melihat total kalori hari ini.");
 });
 
-// Fitur melihat rekap harian & makanan yang sudah dimakan
 bot.onText(/\/rekap/, (msg) => {
     const userId = msg.from.id;
     const today = new Date().toISOString().split('T')[0];
@@ -40,7 +35,6 @@ bot.onText(/\/rekap/, (msg) => {
     bot.sendMessage(msg.chat.id, pesan, { parse_mode: 'Markdown' });
 });
 
-// Fitur pembaca foto makanan & pencatat kalori otomatis
 bot.on('photo', async (msg) => {
     const chatId = msg.chat.id;
     const userId = msg.from.id;
@@ -55,7 +49,7 @@ bot.on('photo', async (msg) => {
         const buffer = await response.arrayBuffer();
         const base64Image = Buffer.from(buffer).toString("base64");
 
-        // Kirim ke Gemini untuk dianalisis nama makanan & kalorinya
+        // Menggunakan model standar gemini-1.5-flash agar tidak error 404
         const aiResponse = await ai.models.generateContent({
             model: 'gemini-1.5-flash',
             contents: [
@@ -78,10 +72,8 @@ bot.on('photo', async (msg) => {
             return;
         }
 
-        // Parsing sederhana nama dan kalori dari AI
         bot.sendMessage(chatId, `✨ *Hasil Analisis Gemini:*\n\n${hasilText}`, { parse_mode: 'Markdown' });
 
-        // Ekstraksi angka kalori untuk dimasukkan ke rekap harian
         const kaloriMatch = hasilText.match(/Kalori:\s*(\d+)/i);
         const namaMatch = hasilText.match(/Nama:\s*(.+)/i);
 
@@ -90,7 +82,6 @@ bot.on('photo', async (msg) => {
             const jumlahKalori = parseInt(kaloriMatch[1]);
             const today = new Date().toISOString().split('T')[0];
 
-            // Inisialisasi data harian jika belum ada atau sudah berganti hari
             if (!userLogs[userId] || userLogs[userId].tanggal !== today) {
                 userLogs[userId] = {
                     tanggal: today,
@@ -99,7 +90,6 @@ bot.on('photo', async (msg) => {
                 };
             }
 
-            // Tambahkan ke riwayat harian
             userLogs[userId].totalKalori += jumlahKalori;
             userLogs[userId].riwayat.push({ nama: namaMakanan, kalori: jumlahKalori });
 
