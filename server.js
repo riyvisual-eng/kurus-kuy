@@ -6,7 +6,7 @@ const token = '8646484566:AAGHZmdFp8xfk3_ypkio_OSbvf-y0P6ZGTk';
 const bot = new TelegramBot(token, { polling: true });
 
 // 2. Inisialisasi Gemini API versi paling stabil
-const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6JSqFnQcmcAB9ZI6M38ZkqGt3wJEu7jz965yi0jzPvzGg' });
+const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6IQz5IGK_NO3DiOmpQSJWM4ClGpTQQjeWKIgNLurhWwbA' });
 
 const userLogs = {};
 
