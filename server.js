@@ -6,7 +6,7 @@ const token = '8674330073:AAEu7tplg7JCfty_iLey__ZwSV3VOvQZ0rU';
 const bot = new TelegramBot(token, { polling: true });
 
 // Inisialisasi Gemini API (Masukkan API Key Google AI Studio kamu)
-const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6KTI9dqWwv7x1x0i4X5l24ebRk1mfocBLK_NlVaDNYX6Q' });
+const ai = new GoogleGenAI({ apiKey: 'AQ.Ab8RN6L_ivmpiCz8-QwLmoTvX-kVoeL-8TCkAH7AbfhuxD53dA' });
 
 // Penyimpanan data kalori harian sementara untuk pengguna (berdasarkan ID Telegram)
 // Format: { userId: { tanggal: 'YYYY-MM-DD', totalKalori: 0, riwayat: [] } }
